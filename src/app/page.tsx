@@ -12,8 +12,10 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <Header />
-      <Body />
+      <>
+        <Header />
+        <Body />
+      </>
     </HydrateClient>
   );
 }
