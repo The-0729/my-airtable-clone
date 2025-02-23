@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LatestPost } from "~/app/_components/post";
 import { api, HydrateClient } from "~/trpc/server";
 import Header from "./_components/Header/Header";
+import Banner from './_components/Banner/Banner';
 import Body from "./_components/Body/Body";
 
 export default async function Home() {
@@ -14,6 +15,7 @@ export default async function Home() {
     <HydrateClient>
       <>
         <Header />
+        <Banner />
         <Body />
       </>
     </HydrateClient>
