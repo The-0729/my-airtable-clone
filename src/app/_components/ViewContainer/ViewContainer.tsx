@@ -13,7 +13,7 @@ export default function ViewContainer() {
     { accessorKey: "age", header: "Age" },
   ];
 
-  const [data, setData] = React.useState(makeData(1000));
+  const [data, setData] = React.useState(makeData(2));
 
   const updateData = (rowIndex: number, columnId: string, value: unknown) => {
     setData((old) =>
