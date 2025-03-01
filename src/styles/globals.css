@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+table .footer-buttons button {
+  border: none;
+  background-color: transparent;
+}
+table .add-button {
+  color: #4bbd7f;
+}

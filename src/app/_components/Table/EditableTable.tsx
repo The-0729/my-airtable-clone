@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   ColumnDef,
   useReactTable,
@@ -10,12 +10,17 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import { Person } from "~/utils/makeData";
+import { FooterCell } from "./FooterCell";
 
 interface EditableTableProps {
   columns: ColumnDef<Person>[];
   data: Person[];
   updateData: (rowIndex: number, columnId: string, value: unknown) => void;
 }
+
+type MyTableMeta = {
+  updateData: (rowIndex: number, columnId: string, value: any) => void;
+};
 
 function useSkipper() {
   const shouldSkipRef = React.useRef(true);
@@ -33,18 +38,16 @@ function useSkipper() {
   return [shouldSkip, skip] as const;
 }
 
-const defaultColumn: Partial<ColumnDef<Person>> = {
+const defaultColumn: Partial<ColumnDef<Person, unknown>> = {
   cell: ({ getValue, row: { index }, column: { id }, table }) => {
     const initialValue = getValue();
-    // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState(initialValue);
 
-    // When the input is blurred, we'll call our table meta's updateData function
     const onBlur = () => {
-      table.options.meta?.updateData(index, id, value);
+      // Explicitly cast table.options.meta as MyTableMeta to avoid TS error
+      (table.options.meta as MyTableMeta)?.updateData(index, id, value);
     };
 
-    // If the initialValue is changed external, sync it up with our state
     React.useEffect(() => {
       setValue(initialValue);
     }, [initialValue]);
@@ -60,11 +63,47 @@ const defaultColumn: Partial<ColumnDef<Person>> = {
 };
 
 export const EditableTable: React.FC<EditableTableProps> = ({
-  columns,
-  data,
+  columns: initialColumns,
+  data: initialData,
   updateData,
 }) => {
+  const [data, setData] = useState<Person[]>(initialData);
+  const [columns, setColumns] = useState<ColumnDef<Person>[]>(initialColumns);
+
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
+
+  const addColumn = () => {
+    const newColumnId = `newColumn${columns.length}`;
+
+    const newColumn: ColumnDef<Person> = {
+      accessorKey: newColumnId,
+      header: `Column ${columns.length + 1}`,
+      cell: ({ row }) => (
+        <input
+          value={(row.original as any)[newColumnId] || ""}
+          onChange={(e) => {
+            const value = e.target.value;
+            setData((oldData) =>
+              oldData.map((row, index) =>
+                index === row.index ? { ...row, [newColumnId]: value } : row,
+              ),
+            );
+          }}
+        />
+      ),
+    };
+
+    setColumns((oldColumns) => [...oldColumns, newColumn]);
+
+    // Add default values for new column in each row
+    setData((oldData) =>
+      oldData.map((row) => ({
+        ...row,
+        [newColumnId]: "", // Default value for the new column
+      })),
+    );
+  };
+
   const table = useReactTable({
     data,
     columns,
@@ -73,22 +112,25 @@ export const EditableTable: React.FC<EditableTableProps> = ({
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     autoResetPageIndex,
-    // Provide our updateData function to our table meta
     meta: {
-      updateData: (rowIndex, columnId, value) => {
-        // Skip page index reset until after next rerender
+      updateData: (rowIndex: number, columnId: string, value: any) => {
         skipAutoResetPageIndex();
         setData((old) =>
-          old.map((row, index) => {
-            if (index === rowIndex) {
-              return {
-                ...old[rowIndex]!,
-                [columnId]: value,
-              };
-            }
-            return row;
-          }),
+          old.map((row, index) =>
+            index === rowIndex ? { ...row, [columnId]: value } : row,
+          ),
         );
+      },
+      addRow: () => {
+        const newRow: Person = {
+          firstName: "New",
+          lastName: "User",
+          age: 0,
+          visits: 0,
+          progress: 0,
+          status: "single",
+        };
+        setData((old) => [...old, newRow]); // ✅ Correct way to add a row
       },
     },
     debugTable: true,
@@ -96,6 +138,12 @@ export const EditableTable: React.FC<EditableTableProps> = ({
 
   return (
     <div className="p-4">
+      <button
+        onClick={addColumn}
+        className="mb-2 rounded border bg-blue-500 px-3 py-1 text-white"
+      >
+        Add Column
+      </button>
       <table className="min-w-full border-collapse border border-gray-300">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -124,23 +172,14 @@ export const EditableTable: React.FC<EditableTableProps> = ({
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr>
+            <th colSpan={table.getCenterLeafColumns().length} align="right">
+              <FooterCell table={table} />
+            </th>
+          </tr>
+        </tfoot>
       </table>
-      <div className="mt-4 flex items-center space-x-2">
-        <button
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-          className="rounded border bg-gray-200 px-3 py-1 hover:bg-gray-300"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-          className="rounded border bg-gray-200 px-3 py-1 hover:bg-gray-300"
-        >
-          Next
-        </button>
-      </div>
     </div>
   );
 };
