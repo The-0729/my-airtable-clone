@@ -13,11 +13,12 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <>
+      <div className="flex flex-col h-screen">
         <Header />
+      
         <Banner />
         <Body />
-      </>
+      </div>
     </HydrateClient>
   );
 }
