@@ -39,7 +39,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className='flex border-b py-2 px-2 sm:px-10 bg-[#944d37] font-sans min-h-[40px] tracking-wide relative z-50'>
+    <header className='flex border-b py-2 px-2 sm:px-10 bg-[#7c37ef] font-sans min-h-[40px] tracking-wide relative z-50'>
       <div className='flex flex-wrap items-center lg:gap-y-2 gap-y-4 gap-x-4 w-full max-w-screen-xl mx-auto'>
         <a href="javascript:void(0)">
           <img src="https://readymadeui.com/readymadeui.svg" alt="logo" className='w-[140px] max-sm:hidden' />
@@ -65,23 +65,25 @@ export default function Header() {
               <a href="javascript:void(0)"><img src="https://readymadeui.com/readymadeui.svg" alt="logo" className='w-36' />
               </a>
             </li>
-            <li className='max-lg:border-b max-lg:py-3'>
-              <a href='javascript:void(0)' className='hover:text-[#ffffff] text-[#ffffff] block font-bold text-[11px]'>Data</a>
-            </li>
-            <li className='max-lg:border-b max-lg:py-3'><a href='javascript:void(0)'
-              className='hover:text-[#ffffff] text-[#ffffff] block font-bold text-[11px]'>Automations</a>
-            </li>
-            <li className='max-lg:border-b max-lg:py-3'><a href='javascript:void(0)'
-              className='hover:text-[#ffffff] text-[#ffffff] block font-bold text-[11px]'>Interfaces</a>
-            </li>
-            <li className='max-lg:border-b max-lg:py-3'><a href='javascript:void(0)'
-              className='hover:text-[#ffffff] text-[#ffffff] block font-bold text-[11px]'>Forms</a>
-            </li>
+            <button className="bg-[#7c37ef] hover:bg-[#5d29b3] text-[#ffffff] font-bold text-[11px] py-0 px-4 rounded-full">
+            Data
+          </button>
+            <button className="bg-[#7c37ef] hover:bg-[#5d29b3] text-[#ffffff] font-bold text-[11px] py-0 px-4 rounded-full">
+            Automatio
+          </button>
+            <button className="bg-[#7c37ef] hover:bg-[#5d29b3] text-[#ffffff] font-bold text-[11px] py-0 px-4 rounded-full">
+            Interfaces
+          </button>
+            <button className="bg-[#7c37ef] hover:bg-[#5d29b3] text-[#ffffff] font-bold text-[11px] py-0 px-4 rounded-full">
+            Forms
+          </button>
           </ul>
         </div>
-
+        <button className="bg-white hover:bg-[#c4ecff] text-[#944d37] font-bold text-[11px] py-0 px-4 rounded-full">
+            Share
+          </button>
         <div className='flex ml-auto space-x-6'>
-          <button className="bg-[#944d37] hover:bg-[#944d99] text-[#ffffff] font-bold text-[11px] py-0 px-4 rounded-full">
+          <button className="bg-[#7c37ef] hover:bg-[#5d29b3] text-[#ffffff] font-bold text-[11px] py-0 px-4 rounded-full">
             Help
           </button>
 
