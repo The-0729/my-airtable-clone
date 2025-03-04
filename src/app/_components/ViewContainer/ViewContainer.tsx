@@ -12,7 +12,6 @@ export default function ViewContainer() {
     { accessorKey: "firstName", header: "First Name", meta: { type: "text" } },
     { accessorKey: "lastName", header: "Last Name", meta: { type: "text" } },
     { accessorKey: "age", header: "Age", meta: { type: "number" } },
-    { accessorKey: "email", header: "Email", meta: { type: "email" } },
   ];
 
   const [data, setData] = React.useState(makeData(2));
