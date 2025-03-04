@@ -229,7 +229,7 @@ const AddColumnMenu = ({
 }) => {
   return (
     <Menu as="div" className="relative">
-      <Menu.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none">
+      <Menu.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400  hover:text-gray-500 focus:outline-none">
         <PlusIcon className="h-5 w-5" aria-hidden="true" />
       </Menu.Button>
       <Transition
@@ -432,19 +432,10 @@ export const EditableTable: React.FC<EditableTableProps> = ({
 
   return (
     <div className="relative flex h-full">
-      <div className="min-w-full overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="min-w-full overflow-hidden  border-gray-200 shadow-sm flex items-start">
+        <table className="flex-1 divide-y divide-gray-200">
           <thead className="bg-gray-50">
-            <tr>
-              <th colSpan={table.getAllColumns().length} className="px-6 py-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-medium text-gray-900">
-                    Table Data
-                  </h2>
-                  <AddColumnMenu onAddColumn={table.options.meta?.addColumn} />
-                </div>
-              </th>
-            </tr>
+      
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -514,6 +505,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                     )}
                   </th>
                 ))}
+       
               </tr>
             ))}
           </thead>
@@ -542,6 +534,9 @@ export const EditableTable: React.FC<EditableTableProps> = ({
             </tr>
           </tfoot>
         </table>
+        <div className="text-center w-[94px] mx-auto h-[40px] border-b border-gray-200  text-xs font-medium tracking-wider text-gray-500 flex items-center justify-center bg-gray-50">
+        <AddColumnMenu onAddColumn={table.options.meta?.addColumn} />
+        </div>
       </div>
     </div>
   );
