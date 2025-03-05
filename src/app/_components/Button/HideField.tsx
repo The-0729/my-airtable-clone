@@ -14,7 +14,6 @@ const HideField = ({ table }: { table: TableInstance }) => {
     <Popover className="h-full">
       <PopoverButton className="flex h-full cursor-pointer items-center gap-1 space-x-1 rounded-[3px] px-1.5 hover:bg-[#0000000d]">
         <EyeSlashIcon className="size-5" />
-        {/* // tổng các field đã hide nếu lengh = 0 thì k hiện */}
         <p className="text-sm font-[400]">
           {table.getAllColumns().filter((col) => !col.getIsVisible()).length >
           0 && `${table.getAllColumns().filter((col) => !col.getIsVisible()).length} `} Hide fields
