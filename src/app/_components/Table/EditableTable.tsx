@@ -8,6 +8,7 @@ import {
   getPaginationRowModel,
   flexRender,
   getFilteredRowModel,
+  Table,
 } from "@tanstack/react-table";
 import { Person } from "~/utils/makeData";
 import { FooterCell } from "./FooterCell";
@@ -28,67 +29,19 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import { faker } from "@faker-js/faker";
+import { ColumnType, ColumnTypeOption } from "~/app/types";
+import { TableInstance } from "~/app/types/table";
+import ColumnMenu from "./ColumnMenu";
+
 interface EditableTableProps {
-  columns: ColumnDef<Person>[];
-  data: Person[];
-  updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+  table: TableInstance;
+  setEditingHeader: (header: { id: string; value: string } | null) => void;
+  editingHeader: { id: string; value: string } | null;
+  handleHeaderEdit: (id: string, value: string) => void;
 }
 
-type MyTableMeta = {
-  updateData: (rowIndex: number, columnId: string, value: any) => void;
-};
-
-function useSkipper() {
-  const shouldSkipRef = React.useRef(true);
-  const shouldSkip = shouldSkipRef.current;
-
-  // Wrap a function with this to skip a pagination reset temporarily
-  const skip = React.useCallback(() => {
-    shouldSkipRef.current = false;
-  }, []);
-
-  React.useEffect(() => {
-    shouldSkipRef.current = true;
-  });
-
-  return [shouldSkip, skip] as const;
-}
-
-const defaultColumn: Partial<ColumnDef<Person, unknown>> = {
-  cell: ({ getValue, row: { index }, column: { id }, table }) => {
-    const initialValue = getValue();
-    const [value, setValue] = React.useState(initialValue);
-
-    const onBlur = () => {
-      (table.options.meta as MyTableMeta)?.updateData(index, id, value);
-    };
-
-    React.useEffect(() => {
-      setValue(initialValue);
-    }, [initialValue]);
-
-    return (
-      <input
-        value={value as string}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={onBlur}
-        className="w-full px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-      />
-    );
-  },
-};
-
-const ColumnMenu = ({
-  column,
-  onRename,
-  onDuplicate,
-  onInsertLeft,
-  onInsertRight,
-  onDelete,
-  onSort,
-  onHide,
-}: {
-  column: any;
+interface ColumnMenuProps {
+  column: TableInstance['columns'][0];
   onRename: () => void;
   onDuplicate: () => void;
   onInsertLeft: () => void;
@@ -96,125 +49,6 @@ const ColumnMenu = ({
   onDelete: () => void;
   onSort: (direction: "asc" | "desc") => void;
   onHide: () => void;
-}) => {
-  return (
-    <Menu as="div" className="relative inline-block text-left">
-      <Menu.Button className="inline-flex items-center justify-center rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none">
-        <ChevronDownIcon className="h-4 w-4" aria-hidden="true" />
-      </Menu.Button>
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
-        <Menu.Items className="ring-opacity-5 absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black focus:outline-none">
-          <div className="py-1">
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={onRename}
-                  className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
-                >
-                  <PencilIcon className="mr-3 h-4 w-4" />
-                  Edit field
-                </button>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={onDuplicate}
-                  className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
-                >
-                  <DocumentDuplicateIcon className="mr-3 h-4 w-4" />
-                  Duplicate field
-                </button>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={onInsertLeft}
-                  className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
-                >
-                  <ArrowLeftIcon className="mr-3 h-4 w-4" />
-                  Insert left
-                </button>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={onInsertRight}
-                  className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
-                >
-                  <ArrowRightIcon className="mr-3 h-4 w-4" />
-                  Insert right
-                </button>
-              )}
-            </Menu.Item>
-            <div className="border-t border-gray-200" />
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={() => onSort("asc")}
-                  className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
-                >
-                  <ArrowsUpDownIcon className="mr-3 h-4 w-4" />
-                  Sort ascending
-                </button>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={() => onSort("desc")}
-                  className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
-                >
-                  <ArrowsUpDownIcon className="mr-3 h-4 w-4" />
-                  Sort descending
-                </button>
-              )}
-            </Menu.Item>
-            <div className="border-t border-gray-200" />
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={onHide}
-                  className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-gray-700`}
-                >
-                  <EyeSlashIcon className="mr-3 h-4 w-4" />
-                  Hide field
-                </button>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={onDelete}
-                  className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-red-600`}
-                >
-                  <TrashIcon className="mr-3 h-4 w-4" />
-                  Delete field
-                </button>
-              )}
-            </Menu.Item>
-          </div>
-        </Menu.Items>
-      </Transition>
-    </Menu>
-  );
-};
-
-type ColumnType = "text" | "number";
-
-interface ColumnTypeOption {
-  label: string;
-  value: ColumnType;
 }
 
 const columnTypes: ColumnTypeOption[] = [
@@ -265,177 +99,36 @@ const AddColumnMenu = ({
 };
 
 export const EditableTable: React.FC<EditableTableProps> = ({
-  columns: initialColumns,
-  data: initialData,
-  updateData,
+  table,
+  setEditingHeader,
+  editingHeader,
+  handleHeaderEdit,
 }) => {
-  const [data, setData] = useState<Person[]>(initialData);
-  const [columns, setColumns] = useState<ColumnDef<Person>[]>(initialColumns);
-  const [editingHeader, setEditingHeader] = useState<{
-    id: string;
-    value: string;
-  } | null>(null);
-
-  const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
-
-  const handleHeaderEdit = (headerId: string, newValue: string) => {
-    setColumns((oldColumns) =>
-      oldColumns.map((col) =>
-        col.accessorKey === headerId ? { ...col, header: newValue } : col,
-      ),
-    );
-    setEditingHeader(null);
+  const handleDuplicateColumn = (columnId: string) => {
+    // Implement column duplication logic
+    console.log('Duplicate column:', columnId);
   };
 
-  // const addColumn = (type: ColumnType) => {
-  //   const newColumnId = `newColumn${columns.length}`;
-
-  //   const newColumn: ColumnDef<Person> = {
-  //     accessorKey: newColumnId,
-  //     header: `New Column`,
-  //     cell: ({ getValue, row: { index }, column: { id }, table }) => {
-  //       const initialValue = getValue();
-  //       const [value, setValue] = React.useState(initialValue);
-
-  //       const onBlur = () => {
-  //         (table.options.meta as MyTableMeta)?.updateData(index, id, value);
-  //       };
-
-  //       return (
-  //         <input
-  //           type={type}
-  //           value={value as string}
-  //           onChange={(e) =>
-  //             setValue(
-  //               type === "number" ? Number(e.target.value) : e.target.value,
-  //             )
-  //           }
-  //           onBlur={onBlur}
-  //           className="w-full px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-  //         />
-  //       );
-  //     },
-  //   };
-
-  //   setColumns((oldColumns) => [...oldColumns, newColumn]);
-  //   setData((oldData) =>
-  //     oldData.map((row) => ({
-  //       ...row,
-  //       [newColumnId]: type === "number" ? 0 : "",
-  //     })),
-  //   );
-  // };
-
-  const checkboxColumn: ColumnDef<Person> = {
-    id: "select",
-    header: ({ table }) => (
-      <div className="">
-        <input
-          type="checkbox"
-          checked={table.getIsAllRowsSelected()}
-          onChange={table.getToggleAllRowsSelectedHandler()}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="px-3 py-2">
-        <input
-          type="checkbox"
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        />
-      </div>
-    ),
-    size: 40,
+  const handleInsertLeft = (columnId: string) => {
+    // Implement insert left logic
+    console.log('Insert left of:', columnId);
   };
 
-  const allColumns = [checkboxColumn, ...columns];
+  const handleInsertRight = (columnId: string) => {
+    // Implement insert right logic
+    console.log('Insert right of:', columnId);
+  };
 
-  const table = useReactTable({
-    data,
-    columns: allColumns,
-    defaultColumn,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    // getPaginationRowModel: getPaginationRowModel(), // chưa dùng pagination
-    autoResetPageIndex,
-    meta: {
-      updateData: (rowIndex: number, columnId: string, value: any) => {
-        skipAutoResetPageIndex();
-        setData((old) =>
-          old.map((row, index) =>
-            index === rowIndex ? { ...row, [columnId]: value } : row,
-          ),
-        );
-      },
-      addRow: () => {
-        const newRow = Object.fromEntries(
-          columns.map((col) => {
-            console.log("🚀 ~ col:", col)
-            return  [col.accessorKey,
-                col.meta?.type === "number"
-                	? faker.number.int(1000)
-                  : faker.person.firstName(),
-              ]
-          }),
-        ) as Person;
-        console.log("🚀 ~ newRow:", newRow);
-        setData((old) => [...old, newRow]);
-      },
-      addColumn: (type: ColumnType) => {
-        console.log("🚀 ~ type:", type)
-        const newColumnId = `newColumn${columns.length}`;
-        const newColumn: ColumnDef<Person> = {
-          accessorKey: newColumnId,
-          header: `New Column`,
-          meta: { type },
-          cell: ({ getValue, row: { index }, column: { id }, table }) => {
-            const initialValue = getValue();
-            const [value, setValue] = React.useState(initialValue);
-
-            const onBlur = () => {
-              (table.options.meta as MyTableMeta)?.updateData(index, id, value);
-            };
-
-            return (
-              <input
-                type={type}
-                value={value as string}
-                onChange={(e) =>
-                  setValue(
-                    type === "number" ? Number(e.target.value) : e.target.value,
-                  )
-                }
-                onBlur={onBlur}
-                className="w-full px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-              />
-            );
-          },
-        };
-
-        setColumns((oldColumns) => [...oldColumns, newColumn]);
-        setData((oldData) =>
-          oldData.map((row) => ({
-            ...row,
-            [newColumnId]:
-              type === "number"
-                ? faker.number.int(1000)
-                : faker.person.firstName(),
-          })),
-        );
-      },
-    },
-    debugTable: true,
-  });
+  const handleDeleteColumn = (columnId: string) => {
+    // Implement delete column logic
+    console.log('Delete column:', columnId);
+  };
 
   return (
     <div className="relative flex h-full">
       <div className="min-w-full overflow-hidden  border-gray-200 shadow-sm flex items-start">
         <table className="flex-1 divide-y divide-gray-200">
           <thead className="bg-gray-50">
-      
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -484,19 +177,21 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                                 onRename={() => {
                                   setEditingHeader({
                                     id: header.column.id,
-                                    value: header.column.columnDef
-                                      .header as string,
+                                    value: header.column.columnDef.header as string,
                                   });
                                 }}
-                                onDuplicate={() => {}}
-                                onInsertRight={() => {}}
-                                onDelete={() => {}}
+                                onDuplicate={() => handleDuplicateColumn(header.column.id)}
+                                onInsertLeft={() => handleInsertLeft(header.column.id)}
+                                onInsertRight={() => handleInsertRight(header.column.id)}
+                                onDelete={() => handleDeleteColumn(header.column.id)}
                                 onSort={(direction) =>
-                                  header.column.toggleSorting(
-                                    direction === "desc",
-                                  )
+                                  header.column.toggleSorting(direction === "desc")
                                 }
-                                onHide={() => {}}
+                                onHide={() => {
+                                  if (header.column.id !== "select") {
+                                    table.options.meta?.toggleColumnVisibility(header.column.id);
+                                  }
+                                }}
                               />
                             )}
                           </>
@@ -505,7 +200,6 @@ export const EditableTable: React.FC<EditableTableProps> = ({
                     )}
                   </th>
                 ))}
-       
               </tr>
             ))}
           </thead>
@@ -535,7 +229,7 @@ export const EditableTable: React.FC<EditableTableProps> = ({
           </tfoot>
         </table>
         <div className="text-center w-[94px] mx-auto h-[40px] border-b border-gray-200  text-xs font-medium tracking-wider text-gray-500 flex items-center justify-center bg-gray-50">
-        <AddColumnMenu onAddColumn={table.options.meta?.addColumn} />
+          <AddColumnMenu onAddColumn={table.options.meta?.addColumn} />
         </div>
       </div>
     </div>

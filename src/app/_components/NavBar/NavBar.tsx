@@ -8,14 +8,20 @@ import {
   ViewColumnsIcon,
   Bars3Icon,
   UserGroupIcon,
+  EyeSlashIcon
 } from "@heroicons/react/24/outline";
-
+import HideField from "../Button/HideField";
+import { TableInstance } from "~/app/types/table";
 const Navbar = ({
   isOpen,
   setIsOpen,
+  onToggleColumnVisibility,
+  table,
 }: {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  onToggleColumnVisibility: () => void;
+  table: TableInstance;
 }) => {
   return (
     <div className="block h-[44px] w-full border-b border-gray-200 bg-white py-[9px] pl-3">
@@ -32,6 +38,8 @@ const Navbar = ({
 
         <div className="mx-2 block h-[50%] border border-gray-200" />
 
+       
+
         <button
           className="flex h-full cursor-pointer items-center gap-1 space-x-1 rounded-[3px] px-1.5 hover:bg-[#0000000d]"
           onClick={() => {}}
@@ -43,10 +51,12 @@ const Navbar = ({
             <ChevronDownIcon className="size-5" />
           </div>
         </button>
+
+        <HideField table={table}/>
+      
       </div>
     </div>
   );
- 
 };
 
 export default Navbar;
