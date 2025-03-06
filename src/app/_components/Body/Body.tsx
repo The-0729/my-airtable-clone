@@ -7,7 +7,7 @@ export default function Body() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="hs-overlay-body-open hs-overlay-body-open:overflow-hidden">
+    <div className="flex-1 hs-overlay-body-open hs-overlay-body-open:overflow-hidden">
       <ViewContainer />
     </div>
   );
